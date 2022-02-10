@@ -6,23 +6,32 @@ final class routerTests: XCTestCase {
         let r = Router()
         r.addRoute("tbx://index") { _ in
             print("root")
-            return true
         }
-        r.addRoute("tbx://hello/:name") { ctx in
-            print("hello \(ctx.params["name"] ?? "")")
-            return true
+        r.addRoute("tbx://intTest/:value") { ctx in
+            if let v = ctx.params.getInt("value") {
+                print("hello \(v)")
+            } else {
+                throw RouterHandleError.canNotHandleUrl
+            }
         }
         r.addRoute("tbx://file/:name") { ctx in
             print("file \(ctx.params["name"] ?? "")")
-            return true
         }
         r.addRoute("tbx://long/long/:name/path") { ctx in
             print("hello \(ctx.params["name"] ?? "")")
-            return true
+        }
+        r.addRoute("http://*path") { ctx in 
+            print("http \(ctx.url)")
+        }
+         r.addRoute("https://*path") { ctx in
+            print("https \(ctx.url)")
         }
         XCTAssert(r.handle("tbx://index"))
-        XCTAssert(r.handle("tbx://hello/world"))
+        XCTAssert(r.handle("tbx://intTest/123"))
         XCTAssert(r.handle("tbx://file/image.jpg"))
         XCTAssert(r.handle("tbx://long/long/world/path"))
+        XCTAssert(r.handle("http://github.com/TBXark/TrieRouter"))
+        XCTAssert(r.handle("https://github.com/TBXark/TrieRouter"))
+
     }
 }

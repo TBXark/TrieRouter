@@ -9,18 +9,18 @@ An App-specific Simple Routing Library
 let r = Router()
 r.addRoute("tbx://index") { _ in
     print("root")
-    return true
 }
-r.addRoute("tbx://hello/:name") { ctx in
-    print("hello \(ctx.params["name"] ?? "")")
-    return true
+r.addRoute("tbx://intTest/:value") { ctx in
+    if let v = ctx.params.getInt("value") {
+        print("hello \(v)")
+    } else {
+        throw RouterHandleError.canNotHandleUrl
+    }
 }
 r.addRoute("tbx://file/:name") { ctx in
     print("file \(ctx.params["name"] ?? "")")
-    return true
 }
 r.addRoute("tbx://long/long/:name/path") { ctx in
     print("hello \(ctx.params["name"] ?? "")")
-    return true
 }
 ```

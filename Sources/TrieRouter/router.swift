@@ -65,10 +65,30 @@ class Node {
 }
 
 public struct Context {
-    public typealias Params = [String: String]
+    public struct Params {
+        var store: [String: String]
+        public subscript(key: String) -> String? {
+            return store[key]
+        }
+    }
     public var url: URL
     public var params: Params
     public var context: Any?
+}
+
+
+extension Context.Params {
+    public func getString(_ key: String) -> String? {
+        return self.store[key]
+    }
+
+    public func getInt(_ key: String) -> Int? {
+        return self.store[key].flatMap { Int($0) }
+    }
+
+    public func getFloat(_ key: String) -> Float? {
+        return self.store[key].flatMap { Float($0) }
+    }
 }
 
 extension URL {
@@ -79,13 +99,29 @@ extension URL {
             return self.path
         }
     }
+    public var queryItems: [URLQueryItem]? {
+        return URLComponents(url: self, resolvingAgainstBaseURL: false)?.queryItems
+    }
+
+    public var queryParameters: [String: String] {
+        var params = [String: String]()
+        for p in self.queryItems ?? [] {
+            params[p.name] = p.value
+        }
+        return params
+    }
 }
 
-public typealias HandlerFunc = (Context) -> Bool
+public typealias HandlerFunc = (Context) throws -> Void
+
+public enum RouterHandleError: Error {
+    case canNotHandleUrl
+}
 
 public class Router {
     var roots = [String: Node]()
     var handlers = [String: HandlerFunc]()
+    public var errorHandler: ((Context, Error) -> Void )? = nil
 
     public init() {
     }
@@ -167,11 +203,18 @@ public class Router {
     public func handle(_ url: URL, context: Any? = nil) -> Bool {
         let group = url.scheme ?? ""
         guard  let res = self.getRoute(group: group, path: url.hostAndPath),
-               let handler = self.handlers[buildKey(group: group, pattern: res.node.pattern)]  else {
+               let handler =  self.handlers[buildKey(group: group, pattern: res.node.pattern)]  else {
                    return false
                }
-        let ctx = Context(url: url, params: res.params, context: context)
-        return handler(ctx)
+        let ctx = Context(url: url, params: Context.Params(store: res.params), context: context)
+        var didHandle = false
+        do {
+            try handler(ctx)
+            didHandle = true
+        } catch let error {
+            self.errorHandler?(ctx, error)
+        }
+        return didHandle
     }
 
 }
