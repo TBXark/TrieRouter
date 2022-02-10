@@ -24,3 +24,25 @@ r.addRoute("tbx://long/long/:name/path") { ctx in
     print("hello \(ctx.params["name"] ?? "")")
 }
 ```
+
+## Requirements
+
+Swift, iOS 9.0+, maxOS 10.10+
+
+
+## Installation
+
+FlexLayout is available through [CocoaPods](https://cocoapods.org). To install
+it, simply add the following line to your Podfile:
+
+```ruby
+pod 'TrieRouter'
+```
+
+## Author
+
+tbxark, tbxark@outlook.com
+
+## License
+
+FlexLayout is available under the MIT license. See the LICENSE file for more info.
