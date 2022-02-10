@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
 	s.homepage = 'https://github.com/TBXark/TrieRouter'
 	s.author   = { 'TBXark' => 'tbxark@outlook.com' }
 	s.source   = { :git => 'https://github.com/TBXark/TrieRouter.git', :tag => "#{s.version}" }
-	s.module_name = 'JSONMapper'
+	s.module_name = 'TrieRouter'
 
 	s.ios.deployment_target = '8.0'
 	s.osx.deployment_target = '10.9'
