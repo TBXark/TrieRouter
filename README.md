@@ -11,11 +11,10 @@ r.addRoute("tbx://index") { _ in
     print("root")
 }
 r.addRoute("tbx://intTest/:value") { ctx in
-    if let v = ctx.params.getInt("value") {
-        print("hello \(v)")
-    } else {
+    guard let v = ctx.params.getInt("value") else {
         throw RouterHandleError.paramsIsInvalid("value")
     }
+    print("hello \(v)")
 }
 r.addRoute("tbx://file/:name") { ctx in
     print("file \(ctx.params["name"] ?? "")")
