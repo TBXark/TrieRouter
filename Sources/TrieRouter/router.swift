@@ -1,6 +1,6 @@
 import Foundation
 
-class Node {
+class Node: CustomDebugStringConvertible {
     var pattern: String
     var part: String
     var isWild: Bool
@@ -11,6 +11,10 @@ class Node {
         self.part = part
         self.isWild = isWild
         self.children = children
+    }
+    
+    var debugDescription: String {
+        return "Node { pattern=\(pattern), part=\(part), isWild=\(isWild) }"
     }
 
     func insert(pattern: String, parts: [String], height: Int) {
@@ -76,7 +80,6 @@ public struct Context {
     public var context: Any?
 }
 
-
 extension Context.Params {
     public func getString(_ key: String) -> String? {
         return self.store[key]
@@ -126,9 +129,15 @@ public enum RouterHandleError: Error {
 public class Router {
     var roots = [String: Node]()
     var handlers = [String: HandlerFunc]()
-    public var errorHandler: ((Context, Error) -> Void )? = nil
+    public var errorHandler: ((Context, Error) -> Void )?
 
     public init() {
+    }
+    
+    func printAllNodes() {
+        for (g, n) in roots {
+            n.travel(list: []).forEach({ print(g + " : " +  $0.debugDescription) })
+        }
     }
 
     func parsePattern(pattern: String) -> [String] {

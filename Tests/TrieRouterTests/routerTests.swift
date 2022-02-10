@@ -20,12 +20,13 @@ final class routerTests: XCTestCase {
         r.addRoute("tbx://long/long/:name/path") { ctx in
             print("hello \(ctx.params["name"] ?? "")")
         }
-        r.addRoute("http://*path") { ctx in 
+        r.addRoute("http://*path") { ctx in
             print("http \(ctx.url)")
         }
-         r.addRoute("https://*path") { ctx in
+        r.addRoute("https://*path") { ctx in
             print("https \(ctx.url)")
         }
+        r.printAllNodes()
         XCTAssert(r.handle("tbx://index"))
         XCTAssert(r.handle("tbx://intTest/123"))
         XCTAssert(r.handle("tbx://file/image.jpg"))
