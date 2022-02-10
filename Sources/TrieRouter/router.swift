@@ -3,16 +3,16 @@ import Foundation
 class Node {
     var pattern: String
     var part: String
-    var isWild:  Bool
+    var isWild: Bool
     var children: [Node]
-    
-    init(pattern: String, part: String, isWild:  Bool, children: [Node]) {
+
+    init(pattern: String, part: String, isWild: Bool, children: [Node]) {
         self.pattern = pattern
         self.part = part
         self.isWild = isWild
         self.children = children
     }
-    
+
     func insert(pattern: String, parts: [String], height: Int) {
         if parts.count == height {
             self.pattern = pattern
@@ -28,23 +28,23 @@ class Node {
         }
         child?.insert(pattern: pattern, parts: parts, height: height + 1)
     }
-    
-    func search(parts :[String], height: Int) -> Node? {
+
+    func search(parts: [String], height: Int) -> Node? {
         if parts.count == height || self.part.hasPrefix("*") {
             if self.pattern == "" {
                 return nil
             }
             return self
         }
-        for c in  self.matchChildren(part:  parts[height]) {
+        for c in  self.matchChildren(part: parts[height]) {
             if let r = c.search(parts: parts, height: height + 1) {
                 return r
             }
         }
         return nil
     }
-    
-    func travel(list: [Node]) -> [Node]{
+
+    func travel(list: [Node]) -> [Node] {
         var temp = list
         if self.pattern != "" {
             temp.append(self)
@@ -54,24 +54,22 @@ class Node {
         }
         return temp
     }
-    
-    func matchChild(part :String) -> Node? {
+
+    func matchChild(part: String) -> Node? {
         return self.children.first(where: { $0.part == part || $0.isWild })
     }
-    
-    func  matchChildren(part :String) -> [Node] {
+
+    func  matchChildren(part: String) -> [Node] {
         return self.children.filter({  $0.part == part || $0.isWild })
     }
 }
 
-
-public struct Context  {
+public struct Context {
     public typealias Params = [String: String]
     public var url: URL
     public var params: Params
     public var context: Any?
 }
-
 
 extension URL {
     var hostAndPath: String {
@@ -88,10 +86,10 @@ public typealias HandlerFunc = (Context) -> Bool
 public class Router {
     var roots = [String: Node]()
     var handlers = [String: HandlerFunc]()
-    
+
     public init() {
     }
-    
+
     func parsePattern(pattern: String) -> [String] {
         let vs = pattern.split(separator: "/").map({ String($0) })
         var parts = [String]()
@@ -105,25 +103,22 @@ public class Router {
         }
         return parts
     }
-    
-    
+
     func buildKey(group: String, pattern: String) -> String {
         return "\(group)-\(pattern)"
     }
-    
-    
-    public func addRoute(urlString: String, handler: @escaping HandlerFunc) {
+
+    public func addRoute(_ urlString: String, handler: @escaping HandlerFunc) {
         guard let url = URL(string: urlString) else {
             return
         }
-        addRoute(url: url, handler: handler)
+        addRoute(url, handler: handler)
     }
-    
-    
-    public func addRoute(url: URL, handler: @escaping HandlerFunc) {
+
+    public func addRoute(_ url: URL, handler: @escaping HandlerFunc) {
         addRoute(group: url.scheme ?? "", pattern: url.hostAndPath, handler: handler)
     }
-    
+
     func addRoute(group: String, pattern: String, handler: @escaping HandlerFunc) {
         let parts = parsePattern(pattern: pattern)
         let key = buildKey(group: group, pattern: pattern)
@@ -132,7 +127,6 @@ public class Router {
         self.roots[group] = node
         self.handlers[key] = handler
     }
-    
 
     func getRoute(group: String, path: String) -> (node: Node, params: [String: String])? {
         let searchParts = parsePattern(pattern: path)
@@ -154,7 +148,7 @@ public class Router {
         }
         return (n, params)
     }
-    
+
     func getRoutes(group: String) -> [Node] {
         if let n = self.roots[group] {
             return n.travel(list: [])
@@ -162,15 +156,15 @@ public class Router {
             return []
         }
     }
-    
-    public func handle(urlString: String, context: Any? = nil) -> Bool {
+
+    public func handle(_ urlString: String, context: Any? = nil) -> Bool {
         guard let url = URL(string: urlString) else {
             return false
         }
-        return handle(url: url, context: context)
+        return handle(url, context: context)
     }
-    
-    public func handle(url: URL, context: Any? = nil) -> Bool {
+
+    public func handle(_ url: URL, context: Any? = nil) -> Bool {
         let group = url.scheme ?? ""
         guard  let res = self.getRoute(group: group, path: url.hostAndPath),
                let handler = self.handlers[buildKey(group: group, pattern: res.node.pattern)]  else {
@@ -179,5 +173,5 @@ public class Router {
         let ctx = Context(url: url, params: res.params, context: context)
         return handler(ctx)
     }
-    
+
 }
