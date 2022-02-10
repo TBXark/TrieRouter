@@ -81,16 +81,46 @@ public struct Context {
 }
 
 extension Context.Params {
-    public func getString(_ key: String) -> String? {
-        return self.store[key]
+    public func getOptionalString(_ key: String) -> String? {
+        let v = try? getString(key)
+        return v
     }
 
-    public func getInt(_ key: String) -> Int? {
-        return self.store[key].flatMap { Int($0) }
+    public func getOptionalInt(_ key: String) -> Int? {
+        let v = try? getInt(key)
+        return v
     }
 
-    public func getFloat(_ key: String) -> Float? {
-        return self.store[key].flatMap { Float($0) }
+    public func getOptionalFloat(_ key: String) -> Float? {
+        let v = try? getFloat(key)
+        return v
+    }
+    
+    public func getString(_ key: String) throws -> String {
+        if let v = self.store[key] {
+            return v
+        }
+        throw RouterHandleError.missingParams(key)
+    }
+
+    public func getInt(_ key: String) throws -> Int {
+        guard let raw = self.store[key] else {
+            throw RouterHandleError.missingParams(key)
+        }
+        guard let v = Int(raw) else {
+            throw RouterHandleError.paramsIsInvalid(key)
+        }
+        return v
+    }
+
+    public func getFloat(_ key: String) throws -> Float {
+        guard let raw = self.store[key] else {
+            throw RouterHandleError.missingParams(key)
+        }
+        guard let v = Float(raw) else {
+            throw RouterHandleError.paramsIsInvalid(key)
+        }
+        return v
     }
 }
 

@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 	s.name     = 'TrieRouter'
-	s.version  = '1.1.1'
+	s.version  = '1.2.0'
 
 	s.license  = { :type => 'MIT', :file => 'LICENSE' }
 	s.summary  = 'An App-specific Simple Routing Library'
