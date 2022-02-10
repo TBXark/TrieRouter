@@ -99,10 +99,13 @@ extension URL {
             return self.path
         }
     }
+
+    @available(iOS 9.0, macOS 10.11, tvOS 9.0, *)
     public var queryItems: [URLQueryItem]? {
         return URLComponents(url: self, resolvingAgainstBaseURL: false)?.queryItems
     }
 
+    @available(iOS 9.0, macOS 10.11, tvOS 9.0, *)
     public var queryParameters: [String: String] {
         var params = [String: String]()
         for p in self.queryItems ?? [] {

@@ -11,7 +11,7 @@ final class routerTests: XCTestCase {
             if let v = ctx.params.getInt("value") {
                 print("hello \(v)")
             } else {
-                throw RouterHandleError.canNotHandleUrl
+                throw RouterHandleError.paramsIsInvalid("value")
             }
         }
         r.addRoute("tbx://file/:name") { ctx in
