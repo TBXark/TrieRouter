@@ -129,7 +129,7 @@ public enum RouterHandleError: Error {
 public class Router {
     var roots = [String: Node]()
     var handlers = [String: HandlerFunc]()
-    public var errorHandler: ((Context, Error) -> Void )?
+    public var errorHandler: ((Context, Error) -> Bool)?
 
     public init() {
     }
@@ -226,7 +226,9 @@ public class Router {
             try handler(ctx)
             didHandle = true
         } catch let error {
-            self.errorHandler?(ctx, error)
+            if let handler = self.errorHandler {
+                didHandle = handler(ctx, error)
+            }
         }
         return didHandle
     }
