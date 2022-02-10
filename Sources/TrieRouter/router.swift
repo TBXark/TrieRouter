@@ -116,6 +116,8 @@ public typealias HandlerFunc = (Context) throws -> Void
 
 public enum RouterHandleError: Error {
     case canNotHandleUrl
+    case missingParams(String)
+    case paramsIsInvalid(String)
 }
 
 public class Router {
