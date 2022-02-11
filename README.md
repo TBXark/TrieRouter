@@ -14,11 +14,13 @@ r.addRoute("tbx://intTest/:value") { ctx in
     let v = try ctx.params.getInt("value")
     print("hello \(v)")
 }
-r.addRoute("tbx://file/:name") { ctx in
-    print("file \(ctx.params["name"] ?? "")")
+r.addRoute("tbx://file/*name") { ctx in
+    let name = try ctx.params.getString("name")
+    print("file \(name)")
 }
 r.addRoute("tbx://long/long/:name/path") { ctx in
-    print("hello \(ctx.params["name"] ?? "")")
+    let name = try ctx.params.getString("name")
+    print("hello \(name)")
 }
 ```
 
