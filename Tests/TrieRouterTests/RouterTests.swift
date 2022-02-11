@@ -24,7 +24,7 @@ final class RouterTests: XCTestCase {
         
        
         do {
-            let tc = "tbx://file/img/banner.png"
+            let tc = "tbx://file/img/banner.png?size=123"
             r.addRoute("tbx://file/*name") { ctx in
                 let v = try ctx.params.getString("name")
                 XCTAssertEqual(v, "img/banner.png")
