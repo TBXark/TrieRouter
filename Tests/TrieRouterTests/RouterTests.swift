@@ -12,7 +12,7 @@ final class RouterTests: XCTestCase {
             }
             allCase.append(tc)
         }
-        
+
         do {
             let tc = "tbx://intTest/123"
             r.addRoute("tbx://intTest/:value") { ctx in
@@ -21,8 +21,7 @@ final class RouterTests: XCTestCase {
             }
             allCase.append(tc)
         }
-        
-       
+
         do {
             let tc = "tbx://file/img/banner.png?size=123"
             r.addRoute("tbx://file/*name") { ctx in
@@ -33,7 +32,7 @@ final class RouterTests: XCTestCase {
             }
             allCase.append(tc)
         }
-        
+
         do {
             let tc = "tbx://long/long/long/path"
             r.addRoute("tbx://long/long/:name/path") { ctx in
@@ -42,7 +41,7 @@ final class RouterTests: XCTestCase {
             }
             allCase.append(tc)
         }
-    
+
         do {
             let tc = "tbx://two/parms/123/and/abc"
             r.addRoute("tbx://two/parms/:first/and/:second") { ctx in
@@ -53,11 +52,11 @@ final class RouterTests: XCTestCase {
             }
             allCase.append(tc)
         }
-        
+
         for c in allCase {
             try r.handle(c)
         }
-        
+
         r.printAllNodes()
 
     }

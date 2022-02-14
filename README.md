@@ -26,7 +26,7 @@ r.addRoute("tbx://long/long/:name/path") { ctx in
 
 ## Requirements
 
-Swift, iOS 9.0+, maxOS 10.10+
+Swift, iOS 8.0+, maxOS 10.10+
 
 
 ## Installation

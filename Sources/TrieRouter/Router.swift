@@ -1,8 +1,15 @@
+//
+//  Router.swift
+//  Router
+//
+//  Created by Tbxark on 2022/2/10.
+//  Copyright © 2022 Tbxark. All rights reserved.
+//
+
 import Foundation
 
-
 public class Router {
-    
+
     public typealias HandlerFunc = (Context) throws -> Void
 
     public struct Context {
@@ -16,7 +23,7 @@ public class Router {
         }
         public var context: Any?
     }
-    
+
     public enum HandleError: Error {
         case roteNotFound(URL)
         case invalidURL(String)
@@ -24,13 +31,12 @@ public class Router {
         case paramsIsInvalid(String)
     }
 
-    
     private var roots = [String: Node]()
     private var handlers = [String: HandlerFunc]()
 
     public init() {
     }
-    
+
     public func printAllNodes() {
         for (g, n) in roots {
             n.travel(list: []).forEach({ print(g + " : " +  $0.debugDescription) })
@@ -135,7 +141,7 @@ class Node: CustomDebugStringConvertible {
         self.isWild = isWild
         self.children = children
     }
-    
+
     var debugDescription: String {
         return "Node { pattern=\(pattern), part=\(part), isWild=\(isWild) }"
     }
@@ -191,7 +197,6 @@ class Node: CustomDebugStringConvertible {
     }
 }
 
-
 extension URL {
     var hostAndPath: String {
         if let h = self.host {
@@ -216,25 +221,28 @@ extension URL {
     }
 }
 
-
-
-
 extension Router.Context.Params {
     public func getOptionalString(_ key: String) -> String? {
-        let v = try? getString(key)
-        return v
+        if let v = self.store[key] {
+            return v
+        }
+        return nil
     }
 
     public func getOptionalInt(_ key: String) -> Int? {
-        let v = try? getInt(key)
+        guard let raw = self.store[key], let v = Int(raw) else {
+            return nil
+        }
         return v
     }
 
     public func getOptionalFloat(_ key: String) -> Float? {
-        let v = try? getFloat(key)
+        guard let raw = self.store[key], let v = Float(raw) else {
+            return nil
+        }
         return v
     }
-    
+
     public func getString(_ key: String) throws -> String {
         if let v = self.store[key] {
             return v
