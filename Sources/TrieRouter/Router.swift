@@ -38,9 +38,15 @@ public class Router {
     }
 
     public func printAllNodes() {
-        for (g, n) in roots {
-            n.travel(list: []).forEach({ print(g + " : " +  $0.debugDescription) })
+        for k, v in allPattern() {
+            for p in v {
+                print("\(k)://\(p)")
+            }
         }
+    }
+
+    public func allPattern() -> [String: [String]] {
+        return roots.mapValues({ $0.travel(list: []).map({ $0.pattern }) })
     }
 
     private func parsePattern(pattern: String) -> [String] {
