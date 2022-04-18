@@ -38,7 +38,7 @@ public class Router {
     }
 
     public func printAllNodes() {
-        for k, v in allPattern() {
+        for (k, v) in allPattern() {
             for p in v {
                 print("\(k)://\(p)")
             }

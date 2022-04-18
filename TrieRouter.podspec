@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
 	s.source   = { :git => 'https://github.com/TBXark/TrieRouter.git', :tag => "#{s.version}" }
 	s.module_name = 'TrieRouter'
 
-	s.ios.deployment_target = '8.0'
+	s.ios.deployment_target = '9.0'
 	s.osx.deployment_target = '10.10'
 	s.watchos.deployment_target = '3.0'
 
