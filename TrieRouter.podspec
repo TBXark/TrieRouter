@@ -15,4 +15,5 @@ Pod::Spec.new do |s|
 
 	s.source_files = 'Sources/TrieRouter/*.swift'
 	s.framework = 'Foundation'
+	s.swift_versions = '4.0'
 end

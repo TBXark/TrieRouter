@@ -48,6 +48,10 @@ public class Router {
     public func allPattern() -> [String: [String]] {
         return roots.mapValues({ $0.travel(list: []).map({ $0.pattern }) })
     }
+    
+    public func allNode() -> [String: [Node]] {
+        return roots.mapValues({ $0.travel(list: []) })
+    }
 
     private func parsePattern(pattern: String) -> [String] {
         let vs = pattern.split(separator: "/").map({ String($0) })
@@ -67,24 +71,25 @@ public class Router {
         return "\(group)::\(pattern)"
     }
 
-    public func addRoute(_ urlString: String, handler: @escaping HandlerFunc) {
+    @discardableResult public func addRoute(_ urlString: String, handler: @escaping HandlerFunc) -> Node? {
         guard let url = URL(string: urlString) else {
-            return
+            return nil
         }
-        addRoute(url, handler: handler)
+        return addRoute(url, handler: handler)
     }
 
-    public func addRoute(_ url: URL, handler: @escaping HandlerFunc) {
-        addRoute(group: url.scheme ?? "", pattern: url.hostAndPath, handler: handler)
+    @discardableResult public func addRoute(_ url: URL, handler: @escaping HandlerFunc) -> Node? {
+        return addRoute(group: url.scheme ?? "", pattern: url.hostAndPath, handler: handler)
     }
 
-    public func addRoute(group: String, pattern: String, handler: @escaping HandlerFunc) {
+    @discardableResult public func addRoute(group: String, pattern: String, handler: @escaping HandlerFunc) -> Node? {
         let parts = parsePattern(pattern: pattern)
         let key = buildKey(group: group, pattern: pattern)
         let node = self.roots[group] ?? Node(pattern: "", part: "", isWild: false, children: [])
         node.insert(pattern: pattern, parts: parts, height: 0)
         self.roots[group] = node
         self.handlers[key] = handler
+        return node.search(parts: parts, height: 0)
     }
 
     private func getRoute(group: String, path: String) -> (node: Node, params: [String: String])? {
@@ -134,73 +139,78 @@ public class Router {
     }
 
 }
+ 
 
-class Node: CustomDebugStringConvertible {
-    private(set) var pattern: String
-    private var part: String
-    private var isWild: Bool
-    private var children: [Node]
+extension Router {
+    public class Node: CustomDebugStringConvertible {
+        public private(set) var pattern: String
+        private var part: String
+        private var isWild: Bool
+        private var children: [Node]
+        public var remark: String?
 
-    init(pattern: String, part: String, isWild: Bool, children: [Node]) {
-        self.pattern = pattern
-        self.part = part
-        self.isWild = isWild
-        self.children = children
-    }
-
-    var debugDescription: String {
-        return "Node { pattern=\(pattern), part=\(part), isWild=\(isWild) }"
-    }
-
-    func insert(pattern: String, parts: [String], height: Int) {
-        if parts.count == height {
+        init(pattern: String, part: String, isWild: Bool, children: [Node]) {
             self.pattern = pattern
-            return
+            self.part = part
+            self.isWild = isWild
+            self.children = children
         }
-        let part = parts[height]
-        var child: Node? = self.matchChild(part: part)
-        if child == nil {
-            let isWild = part.hasPrefix(":") || part.hasPrefix("*")
-            let _child = Node(pattern: "", part: part, isWild: isWild, children: [])
-            self.children.append(_child)
-            child = _child
-        }
-        child?.insert(pattern: pattern, parts: parts, height: height + 1)
-    }
 
-    func search(parts: [String], height: Int) -> Node? {
-        if parts.count == height || self.part.hasPrefix("*") {
-            if self.pattern == "" {
-                return nil
+        public var debugDescription: String {
+            return "Node { pattern=\(pattern), part=\(part), isWild=\(isWild) }"
+        }
+
+        func insert(pattern: String, parts: [String], height: Int) {
+            if parts.count == height {
+                self.pattern = pattern
+                return
             }
-            return self
-        }
-        for c in  self.matchChildren(part: parts[height]) {
-            if let r = c.search(parts: parts, height: height + 1) {
-                return r
+            let part = parts[height]
+            var child: Node? = self.matchChild(part: part)
+            if child == nil {
+                let isWild = part.hasPrefix(":") || part.hasPrefix("*")
+                let _child = Node(pattern: "", part: part, isWild: isWild, children: [])
+                self.children.append(_child)
+                child = _child
             }
+            child?.insert(pattern: pattern, parts: parts, height: height + 1)
         }
-        return nil
+
+        func search(parts: [String], height: Int) -> Node? {
+            if parts.count == height || self.part.hasPrefix("*") {
+                if self.pattern == "" {
+                    return nil
+                }
+                return self
+            }
+            for c in  self.matchChildren(part: parts[height]) {
+                if let r = c.search(parts: parts, height: height + 1) {
+                    return r
+                }
+            }
+            return nil
+        }
+
+        func travel(list: [Node]) -> [Node] {
+            var temp = list
+            if self.pattern != "" {
+                temp.append(self)
+            }
+            for c in self.children {
+                temp = c.travel(list: temp)
+            }
+            return temp
+        }
+
+        private func matchChild(part: String) -> Node? {
+            return self.children.first(where: { $0.part == part || $0.isWild })
+        }
+
+        private func matchChildren(part: String) -> [Node] {
+            return self.children.filter({  $0.part == part || $0.isWild })
+        }
     }
 
-    func travel(list: [Node]) -> [Node] {
-        var temp = list
-        if self.pattern != "" {
-            temp.append(self)
-        }
-        for c in self.children {
-            temp = c.travel(list: temp)
-        }
-        return temp
-    }
-
-    private func matchChild(part: String) -> Node? {
-        return self.children.first(where: { $0.part == part || $0.isWild })
-    }
-
-    private func matchChildren(part: String) -> [Node] {
-        return self.children.filter({  $0.part == part || $0.isWild })
-    }
 }
 
 extension URL {
