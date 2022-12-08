@@ -28,7 +28,7 @@ dependencies: [
 #### CocoaPods
 
 ```ruby
-pod 'TrieRouter', '~> 7.0'
+pod 'TrieRouter', '~> 1.3.3'
 ```
 
 ### 
