@@ -1,4 +1,4 @@
-## TrieRouter
+# TrieRouter
 
 TrieRouter is a URL router implemented in Swift, that uses a trie data structure to store and match URL patterns. It supports URL parameters and wildcards.
 
