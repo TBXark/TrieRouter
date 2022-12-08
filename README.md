@@ -1,4 +1,4 @@
-# TrieRouter
+## TrieRouter
 
 TrieRouter is a URL router implemented in Swift, that uses a trie data structure to store and match URL patterns. It supports URL parameters and wildcards.
 
@@ -19,23 +19,19 @@ TrieRouter is a URL router implemented in Swift, that uses a trie data structure
 
 #### Swift Package Manager
 
-Add the following to your `Package.swift` file's `dependencies`:
-
 ```swift
-.package(url: "https://github.com/TBXark/TrieRouter.git", from: "1.0.0")
+dependencies: [
+    .package(url: "https://github.com/tbxark/TrieRouter.git", .upToNextMajor(from: "1.3.3"))
+]
 ```
-
-Then, in the target where you want to use TrieRouter, add `"TrieRouter"` to your `dependencies`.
 
 #### CocoaPods
 
-Add the following to your `Podfile`:
-
 ```ruby
-pod 'TrieRouter'
+pod 'TrieRouter', '~> 7.0'
 ```
 
-Then, run `pod install`.
+### 
 
 ## Usage
 
