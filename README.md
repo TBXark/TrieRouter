@@ -56,6 +56,78 @@ router.addRoute("example://long/long/:name/path") { ctx in
 }
 ```
 
+
+## Best Practice
+
+### UIKit
+
+```Swift
+// 1. Adding base protocols
+typealias RouterContext = Router.Context
+typealias RouterNode = Router.Node
+
+protocol NavigatorRegisterType {
+    static func urlOpenHandlerFactory(_ context: RouterContext) throws
+}
+
+extension NavigatorRegisterType {
+    @discardableResult static func register(byRouter router: Router, urlPattern: String) -> RouterNode? {
+        return router.addRoute(urlPattern, handler: { ctx in
+            try urlOpenHandlerFactory(ctx)
+        })
+    }
+}
+
+protocol ControllerNavigatorRegisterType: NavigatorRegisterType {
+    static func viewControllerFactory(_ context: RouterContext) throws -> UIViewController
+}
+
+final class ControllerStackService {
+    static func open(controller vc: UIViewController, forcePresent: Bool = false) {
+        // Implement this function according to your app
+    }
+}
+
+extension ControllerNavigatorRegisterType {
+    static func urlOpenHandlerFactory(_ context: RouterContext) throws {
+        let vc = try viewControllerFactory(context)
+        var forcePresent = false
+        if let ctx = context.context as? JSONElement {
+            forcePresent = ctx.forcePresent.boolValue ?? false
+        }
+        
+        ControllerStackService.open(controller: vc, forcePresent: forcePresent) 
+    }
+}
+
+
+// 2. UIViewController implements ControllerNavigatorRegisterType.
+class UserDetailViewController: UIViewController, ControllerNavigatorRegisterType  {
+    let id: Int
+    
+    init(id: Int) {
+        self.id = id
+        // ...
+    }
+    
+    // ...
+    
+    
+    // MARK： - ControllerNavigatorRegisterType
+    static func viewControllerFactory(_ context: RouterContext) throws -> UIViewController {
+        let id = try context.params.getInt("id")
+        return UserDetailViewController(id: ModelSQLID(id))
+    }
+}
+
+
+// 3. Initializing Routes
+let router = Router()
+UserDetailViewController.register(byRouter: router, urlPattern: "example://user/:id")
+
+    
+```
+
 ## Author
 
 tbxark, [tbxark@outlook.com](mailto:tbxark@outlook.com)
