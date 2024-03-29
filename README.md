@@ -116,7 +116,7 @@ class UserDetailViewController: UIViewController, ControllerNavigatorRegisterTyp
     // MARK： - ControllerNavigatorRegisterType
     static func viewControllerFactory(_ context: RouterContext) throws -> UIViewController {
         let id = try context.params.getInt("id")
-        return UserDetailViewController(id: ModelSQLID(id))
+        return UserDetailViewController(id: id)
     }
 }
 
